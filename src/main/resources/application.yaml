@@ -16,10 +16,18 @@ spring:
     database: postgresql
 camunda.bpm:
   admin-user:
-    id: demo
-    password: demo
-    firstName: Demo
+    id: admin
+    password: admin
+    firstName: Admin
   filter:
     create: All tasks
   database:
     schema-update: true
+springdoc:
+  packages-to-scan: com.easyflow.creditapproval.controller
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
