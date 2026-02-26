@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +30,11 @@ public class CreditProposalController {
             summary = "Cria uma proposta de crédito",
             description = "Cria a proposta (status inicial PENDING), inicia o processo 'credit_proposal' no Camunda e retorna os dados persistidos."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Proposta criada e processo iniciado",
-                    content = @Content(schema = @Schema(implementation = CreditProposalResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Payload inválido (validações Bean Validation)", content = @Content)
-    })
+    @ApiResponse(responseCode = "201", description = "Proposta criada e processo iniciado",
+            content = @Content(schema = @Schema(implementation = CreditProposalResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Payload inválido (validações Bean Validation)", content = @Content)
     @PostMapping
-    public ResponseEntity<CreditProposalResponse> create(@Valid @RequestBody CreateCreditProposalRequest dto){
+    public ResponseEntity<CreditProposalResponse> create(@Valid @RequestBody CreateCreditProposalRequest dto) {
         var response = service.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,10 +42,8 @@ public class CreditProposalController {
     @Operation(summary = "Lista tarefas pendentes de análise manual",
             description = "Retorna as User Tasks ativas ('review_proposal') aguardando decisão. " +
                     "Use o taskId retornado para aprovar/rejeitar.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaskResponseDTO.class))))
-    })
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaskResponseDTO.class))))
     @GetMapping("/tasks")
     public ResponseEntity<List<TaskResponseDTO>> listTasks() {
         return ResponseEntity.ok(service.getPendingTasks());
@@ -56,30 +51,26 @@ public class CreditProposalController {
 
     @Operation(summary = "Aprova uma tarefa manual",
             description = "Completa a task com manualApproval=true. O fluxo segue para aprovação e persiste status APPROVED.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Task completada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Task não encontrada",
-                    content = @Content(schema = @Schema(implementation = ApiError.class))),
-            @ApiResponse(responseCode = "409", description = "Task já completada ou em conflito",
-                    content = @Content(schema = @Schema(implementation = ApiError.class)))
-    })
+    @ApiResponse(responseCode = "204", description = "Task completada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Task não encontrada",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    @ApiResponse(responseCode = "409", description = "Task já completada ou em conflito",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
     @PostMapping("/tasks/{taskId}/approve")
-    public ResponseEntity<Void> approve(@PathVariable String taskId){
+    public ResponseEntity<Void> approve(@PathVariable String taskId) {
         service.approveTask(taskId);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Rejeita uma tarefa manual",
             description = "Completa a task com manualApproval=false. O fluxo segue para rejeição e persiste status REJECTED.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Task completada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Task não encontrada",
-                    content = @Content(schema = @Schema(implementation = ApiError.class))),
-            @ApiResponse(responseCode = "409", description = "Task já completada ou em conflito",
-                    content = @Content(schema = @Schema(implementation = ApiError.class)))
-    })
+    @ApiResponse(responseCode = "204", description = "Task completada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Task não encontrada",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    @ApiResponse(responseCode = "409", description = "Task já completada ou em conflito",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
     @PostMapping("/tasks/{taskId}/reject")
-    public ResponseEntity<Void> reject(@PathVariable String taskId){
+    public ResponseEntity<Void> reject(@PathVariable String taskId) {
         service.rejectTask(taskId);
         return ResponseEntity.noContent().build();
     }
