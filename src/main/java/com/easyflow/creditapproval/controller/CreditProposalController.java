@@ -80,7 +80,7 @@ public class CreditProposalController {
     })
     @PostMapping("/tasks/{taskId}/reject")
     public ResponseEntity<Void> reject(@PathVariable String taskId){
-        service.rejectTasks(taskId);
+        service.rejectTask(taskId);
         return ResponseEntity.noContent().build();
     }
 }

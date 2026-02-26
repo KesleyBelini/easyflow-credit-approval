@@ -8,7 +8,7 @@ import com.easyflow.creditapproval.entity.ProposalStatus;
 import com.easyflow.creditapproval.exception.TaskNotFoundException;
 import com.easyflow.creditapproval.mapper.CreditProposalMapper;
 import com.easyflow.creditapproval.repository.CreditProposalRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -17,20 +17,18 @@ import org.camunda.bpm.engine.task.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CreditProposalService {
     private final TaskService taskService;
-    private CreditProposalRepository creditProposalRepository;
-    private CreditProposalMapper mapper;
-    private RuntimeService runtimeService;
+    private final CreditProposalRepository creditProposalRepository;
+    private final CreditProposalMapper mapper;
+    private final RuntimeService runtimeService;
 
     @Transactional
     public CreditProposalResponse save(CreateCreditProposalRequest dto) {
@@ -75,7 +73,7 @@ public class CreditProposalService {
                     Integer score = (Integer) taskService.getVariable(task.getId(), "score");
                     return new TaskResponseDTO(task.getId(), proposalId, name, score);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void approveTask(String taskId) {
@@ -89,7 +87,7 @@ public class CreditProposalService {
         log.info("[SERVICE] Task {} approved", taskId);
     }
 
-    public void rejectTasks(String taskId) {
+    public void rejectTask(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new TaskNotFoundException("Task not found: " + taskId);
